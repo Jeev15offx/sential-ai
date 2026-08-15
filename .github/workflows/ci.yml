@@ -22,4 +22,4 @@ jobs:
       - run: pytest
 
       - name: Build Docker image
-         run: docker build -t sentinal-ai:CI .
+         run: docker build -t sentinal-ai:ci .

@@ -31,3 +31,8 @@ reports/markdown/*
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Security scan reports
+reports/
+
+trivyreport.txt

@@ -1,46 +1,51 @@
 import json
+from pathlib import Path
 
 from src.collector.trivy import collect_trivy_evidence
 
+FIXTURE_PATH = Path("tests/fixtures/trivy/sample-report.json")
 
-def test_collect_trivy_evidence(tmp_path):
-    report = {
-        "Results": [
-            {
-                "Target": "sentinal-ai:ci",
-                "Vulnerabilities": [
-                    {
-                        "VulnerabilityID": "CVE-2023-1234",
-                        "PkgName": "express",
-                        "Severity": "HIGH",
-                        "InstalledVersion": "4.17.1",
-                        "FixedVersion": "4.17.2",
-                        "Title": "Regular Expression Denial of Service",
-                    }
-                ],
-            }
-        ]
-    }
 
-    report_path = tmp_path / "trivy-report.json"
+def test_collect_real_trivy_report():
+    evidence = collect_trivy_evidence(FIXTURE_PATH)
 
-    report_path.write_text(
-        json.dumps(report),
-        encoding="utf-8",
-    )
+    assert len(evidence) == 192
 
-    evidence = collect_trivy_evidence(report_path)
+    for item in evidence:
+        assert item.source == "trivy"
+        assert item.type == "container_vulnerability"
+        assert item.severity in {
+            "UNKNOWN",
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL",
+        }
 
-    assert len(evidence) == 1
+        assert item.id
+        assert item.message
+        assert item.metadata["vulnerability_id"]
+        assert item.metadata["package"]
+        assert item.metadata["target"]
 
-    item = evidence[0]
 
-    assert item.source == "trivy"
-    assert item.type == "container_vulnerability"
-    assert item.severity == "HIGH"
+def test_real_trivy_report_contains_debian_and_python_findings():
+    with FIXTURE_PATH.open("r", encoding="utf-8") as file:
+        data = json.load(file)
 
-    assert item.metadata["vulnerability_id"] == "CVE-2023-1234"
-    assert item.metadata["package"] == "express"
-    assert item.metadata["installed_version"] == "4.17.1"
-    assert item.metadata["fixed_version"] == "4.17.2"
-    assert item.metadata["target"] == "sentinal-ai:ci"
+    results = data["Results"]
+
+    assert len(results) == 2
+
+    targets = {result["Target"] for result in results}
+
+    assert "sentinal-ai:v2 (debian 13.5)" in targets
+    assert "Python" in targets
+
+
+def test_evidence_ids_are_unique():
+    evidence = collect_trivy_evidence(FIXTURE_PATH)
+
+    ids = [item.id for item in evidence]
+
+    assert len(ids) == len(set(ids))

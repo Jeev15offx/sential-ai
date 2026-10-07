@@ -385,3 +385,63 @@ def test_missing_fixed_version_uses_generic_remediation():
 
     assert "None" not in root_cause.remediation_hint
     assert "openssl" in root_cause.remediation_hint
+
+
+def test_highest_severity_vulnerability_drives_remediation():
+    evidence = [
+        Evidence(
+            id="evidence-high",
+            source="trivy",
+            type="container_vulnerability",
+            timestamp=datetime.now(timezone.utc),
+            severity="HIGH",
+            message="HIGH vulnerability in openssl",
+            metadata={
+                "target": "sentinal-ai:v2",
+                "package": "openssl",
+                "vulnerability_id": "CVE-HIGH",
+                "installed_version": "3.0.2",
+                "fixed_version": "3.0.15",
+            },
+        ),
+        Evidence(
+            id="evidence-critical",
+            source="trivy",
+            type="container_vulnerability",
+            timestamp=datetime.now(timezone.utc),
+            severity="CRITICAL",
+            message="CRITICAL vulnerability in openssl",
+            metadata={
+                "target": "sentinal-ai:v2",
+                "package": "openssl",
+                "vulnerability_id": "CVE-CRITICAL",
+                "installed_version": "3.0.2",
+                "fixed_version": "3.0.17",
+            },
+        ),
+    ]
+
+    correlation_groups = [
+        CorrelationGroup(
+            group_id="group-openssl",
+            evidence_ids=[
+                "evidence-high",
+                "evidence-critical",
+            ],
+            correlation_reason="Same target and same package",
+            score=2,
+            primary_evidence="evidence-high",
+        ),
+    ]
+
+    root_causes = analyze_root_causes(
+        evidence_list=evidence,
+        correlation_groups=correlation_groups,
+    )
+
+    assert len(root_causes) == 1
+
+    root_cause = root_causes[0]
+
+    assert root_cause.confidence == 0.95
+    assert "3.0.17" in root_cause.remediation_hint

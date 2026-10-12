@@ -445,3 +445,23 @@ def test_highest_severity_vulnerability_drives_remediation():
 
     assert root_cause.confidence == 0.95
     assert "3.0.17" in root_cause.remediation_hint
+
+
+def test_missing_evidence_reference_raises_clear_error():
+    correlation_group = CorrelationGroup(
+        group_id="group-missing",
+        evidence_ids=["evidence-does-not-exist"],
+        correlation_reason="Same target and same package",
+        score=2,
+        primary_evidence="evidence-does-not-exist",
+    )
+
+    try:
+        analyze_root_causes(
+            evidence_list=[],
+            correlation_groups=[correlation_group],
+        )
+    except ValueError as error:
+        assert "evidence-does-not-exist" in str(error)
+    else:
+        raise AssertionError("Expected ValueError for a missing evidence reference")

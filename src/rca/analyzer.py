@@ -50,10 +50,25 @@ def analyze_root_causes(
         correlation_groups,
         start=1,
     ):
+        # Validate that every referenced evidence ID exists.
+        missing_evidence_ids = [
+            evidence_id
+            for evidence_id in group.evidence_ids
+            if evidence_id not in evidence_by_id
+        ]
+
+        if missing_evidence_ids:
+            raise ValueError(
+                f"Correlation group '{group.group_id}' references "
+                f"missing evidence IDs: {', '.join(missing_evidence_ids)}"
+            )
+
+        # Retrieve the evidence associated with this group.
         group_evidence = [
             evidence_by_id[evidence_id] for evidence_id in group.evidence_ids
         ]
 
+        # Select the evidence with the highest severity.
         primary_evidence = max(
             group_evidence,
             key=lambda evidence: severity_rank.get(
@@ -81,7 +96,7 @@ def analyze_root_causes(
                 root_cause_id=f"rca-{index:03d}",
                 correlation_group_id=group.group_id,
                 root_cause_type="container_vulnerability",
-                summary=(f"Vulnerable {package} package detected"),
+                summary=f"Vulnerable {package} package detected",
                 explanation=(
                     f"The container contains a vulnerable " f"version of {package}."
                 ),

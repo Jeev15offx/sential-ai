@@ -1,11 +1,11 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from src.correlator.correlator import correlate_evidence
 from src.schemas.evidence import Evidence
 
 
 def test_same_target_and_package_are_correlated():
-    timestamp = datetime.now(timezone.utc)
+    timestamp = datetime.now(UTC)
 
     evidence_a = Evidence(
         id="evidence-001",
@@ -48,7 +48,7 @@ def test_same_target_and_package_are_correlated():
 
 
 def test_different_packages_are_not_correlated():
-    timestamp = datetime.now(timezone.utc)
+    timestamp = datetime.now(UTC)
 
     evidence_a = Evidence(
         id="evidence-001",
@@ -82,7 +82,7 @@ def test_different_packages_are_not_correlated():
 
 
 def test_different_targets_are_not_correlated():
-    timestamp = datetime.now(timezone.utc)
+    timestamp = datetime.now(UTC)
 
     evidence_a = Evidence(
         id="evidence-001",
@@ -116,7 +116,7 @@ def test_different_targets_are_not_correlated():
 
 
 def test_every_evidence_item_is_preserved():
-    timestamp = datetime.now(timezone.utc)
+    timestamp = datetime.now(UTC)
 
     evidence_a = Evidence(
         id="evidence-001",
@@ -196,7 +196,7 @@ def test_every_evidence_item_is_preserved():
 
 
 def test_correlation_group_metadata_is_valid():
-    timestamp = datetime.now(timezone.utc)
+    timestamp = datetime.now(UTC)
 
     evidence_a = Evidence(
         id="evidence-001",

@@ -1,10 +1,10 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from src.schemas.evidence import Evidence
 
 
 def test_evidence_creation():
-    timestamp = datetime.now(timezone.utc)
+    timestamp = datetime.now(UTC)
 
     evidence = Evidence(
         id="EV-001",

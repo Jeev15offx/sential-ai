@@ -1,6 +1,6 @@
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -90,7 +90,7 @@ def collect_trivy_evidence(
 
     evidence_list: list[Evidence] = []
 
-    collection_time = datetime.now(timezone.utc)
+    collection_time = datetime.now(UTC)
 
     for result in results:
 

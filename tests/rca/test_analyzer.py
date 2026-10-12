@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from src.rca.analyzer import analyze_root_causes
 from src.schemas.correlation import CorrelationGroup
@@ -11,7 +11,7 @@ def test_vulnerable_package_produces_root_cause():
             id="evidence-001",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="HIGH",
             message="CVE-2026-0001: Vulnerability detected in package openssl",
             metadata={
@@ -50,7 +50,7 @@ def test_multiple_vulnerabilities_same_package_produce_one_root_cause():
             id="evidence-001",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="HIGH",
             message="CVE-2026-0001: Vulnerability detected in package openssl",
             metadata={
@@ -63,7 +63,7 @@ def test_multiple_vulnerabilities_same_package_produce_one_root_cause():
             id="evidence-002",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="CRITICAL",
             message="CVE-2026-0002: Vulnerability detected in package openssl",
             metadata={
@@ -108,7 +108,7 @@ def test_different_packages_produce_separate_root_causes():
             id="evidence-001",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="HIGH",
             message="CVE-2026-0001: Vulnerability detected in package openssl",
             metadata={
@@ -121,7 +121,7 @@ def test_different_packages_produce_separate_root_causes():
             id="evidence-002",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="CRITICAL",
             message="CVE-2026-0002: Vulnerability detected in package curl",
             metadata={
@@ -172,7 +172,7 @@ def test_root_cause_preserves_all_evidence_ids():
             id="evidence-001",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="HIGH",
             message="CVE-2026-0001: Vulnerability detected in package openssl",
             metadata={
@@ -185,7 +185,7 @@ def test_root_cause_preserves_all_evidence_ids():
             id="evidence-002",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="CRITICAL",
             message="CVE-2026-0002: Vulnerability detected in package openssl",
             metadata={
@@ -198,7 +198,7 @@ def test_root_cause_preserves_all_evidence_ids():
             id="evidence-003",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="MEDIUM",
             message="CVE-2026-0003: Vulnerability detected in package openssl",
             metadata={
@@ -243,7 +243,7 @@ def test_critical_vulnerability_has_higher_confidence_than_low():
             id="evidence-low",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="LOW",
             message="LOW vulnerability in openssl",
             metadata={
@@ -256,7 +256,7 @@ def test_critical_vulnerability_has_higher_confidence_than_low():
             id="evidence-critical",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="CRITICAL",
             message="CRITICAL vulnerability in curl",
             metadata={
@@ -310,7 +310,7 @@ def test_fixed_version_is_used_in_remediation_hint():
             id="evidence-openssl",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="HIGH",
             message="HIGH vulnerability in openssl",
             metadata={
@@ -351,7 +351,7 @@ def test_missing_fixed_version_uses_generic_remediation():
             id="evidence-openssl",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="HIGH",
             message="HIGH vulnerability in openssl",
             metadata={
@@ -393,7 +393,7 @@ def test_highest_severity_vulnerability_drives_remediation():
             id="evidence-high",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="HIGH",
             message="HIGH vulnerability in openssl",
             metadata={
@@ -408,7 +408,7 @@ def test_highest_severity_vulnerability_drives_remediation():
             id="evidence-critical",
             source="trivy",
             type="container_vulnerability",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             severity="CRITICAL",
             message="CRITICAL vulnerability in openssl",
             metadata={

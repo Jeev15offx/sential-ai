@@ -49,3 +49,58 @@ def test_evidence_ids_are_unique():
     ids = [item.id for item in evidence]
 
     assert len(ids) == len(set(ids))
+
+
+def test_collector_skips_invalid_vulnerability_entries(tmp_path):
+    report = {
+        "Results": [
+            {
+                "Target": "test-image",
+                "Vulnerabilities": [
+                    None,
+                    "invalid-entry",
+                    {
+                        "VulnerabilityID": "CVE-2026-1234",
+                        "PkgName": "test-package",
+                        "Severity": "HIGH",
+                    },
+                ],
+            }
+        ]
+    }
+
+    report_path = tmp_path / "report.json"
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+
+    evidence = collect_trivy_evidence(report_path)
+
+    assert len(evidence) == 1
+    assert evidence[0].metadata["vulnerability_id"] == "CVE-2026-1234"
+    assert evidence[0].metadata["package"] == "test-package"
+
+
+def test_collector_skips_invalid_result_entries(tmp_path):
+    report = {
+        "Results": [
+            None,
+            "invalid-result",
+            {
+                "Target": "test-image",
+                "Vulnerabilities": [
+                    {
+                        "VulnerabilityID": "CVE-2026-1234",
+                        "PkgName": "test-package",
+                        "Severity": "HIGH",
+                    }
+                ],
+            },
+        ]
+    }
+
+    report_path = tmp_path / "report.json"
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+
+    evidence = collect_trivy_evidence(report_path)
+
+    assert len(evidence) == 1
+    assert evidence[0].metadata["target"] == "test-image"
